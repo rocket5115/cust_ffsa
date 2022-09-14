@@ -1,0 +1,121 @@
+html {
+    height: 100%;
+    width: 100%;
+    user-select: none;
+}
+
+#background {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    filter: blur(6px) sepia(50%);
+}
+
+#mark {
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.marker {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    transition: 80ms;
+    background-color: blue;
+}
+
+.marker_text {
+    position: relative;
+    top: -50%;
+    text-align: center;
+    color: rgba(220, 219, 219, 0.911);
+}
+
+#list {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    background-color: rgba(51, 38, 38, 0.736);
+}
+
+#list>div {
+    position: relative;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    border: 5px solid rgba(18, 18, 18, 0.713);
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 10px;
+}
+
+#list>div>* {
+    color: rgba(237, 237, 237, 0.905);
+    transition: 0.2s ease-in-out 10ms;
+}
+
+.onhover:hover {
+    font-size: 36px;
+    color: black;
+    background-color: rgba(186, 186, 186, 0.832);
+    cursor: pointer;
+}
+
+#WeaponsAmmo {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 200%;
+    text-align: center;
+    border-right: 5px solid rgba(18, 18, 18, 0.713);
+    background-color: rgb(13, 13, 108);
+}
+
+#WeaponsSelect {
+    display: grid;
+    grid-template-rows: 49.5% 49.5%;
+    grid-gap: 10px;
+}
+
+#WeaponsSelect>div {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 200%;
+    text-align: center;
+    border-right: 5px solid rgba(18, 18, 18, 0.713);
+    border-left: 5px solid rgba(18, 18, 18, 0.713);
+}
+
+#Weapons {
+    border-bottom: 5px solid rgba(18, 18, 18, 0.713);
+    background-color: rgb(13, 108, 35);
+}
+
+#SpecialWeapons {
+    border-top: 5px solid rgba(18, 18, 18, 0.713);
+    background-color: rgb(108, 65, 13);
+}
+
+#WeaponsSell {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 200%;
+    text-align: center;
+    border-left: 5px solid rgba(18, 18, 18, 0.713);
+    background-color: rgb(86, 108, 13);
+}
