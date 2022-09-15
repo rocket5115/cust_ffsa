@@ -35,7 +35,7 @@ local function getvalue(list,value)
         return nil
     end
     for _,v in pairs(list)do
-        if string.match(v,value)then
+        if v==value then
             return v
         end
     end
