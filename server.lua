@@ -295,9 +295,9 @@ end
 CreateThread(function()
     repeat Wait(1)until ready==2
     for i=1,#query do
-        query[(#query+1)-i]()
-        query[i]=nil
+        query[i]()
     end
+    query=nil
 end)
 
 DB.ready = promise:new()
@@ -417,3 +417,20 @@ RegisterCommand('ffsa_create_db_template', function(source, args)
     SaveResourceFile(resource,'db/'..name,encode(tp),-1)
     print('^3Created Global Save Template: '..name..'^7')
 end)
+
+DB.Ready(function()
+    db = DB.New(true)
+    local res = db('CREATE', 'items', json.encode({
+        name='',
+        limit=0,
+        mission=0
+    }))
+    print(res)
+end)
+
+SetRoutingBucketEntityLockdownMode(1, 'strict')
+
+local filename = function()
+    return debug.getinfo(2,"S").source:sub(2):match("^.*/(.*).lua$")
+end
+print(filename())

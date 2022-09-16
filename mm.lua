@@ -13,6 +13,8 @@ local weapons = {}
 local addons = {}
 local metadata = {}
 
+local items = {}
+
 DB.Ready(function()
     local db = DB.New()
     local result = db('SELECT', 'users')
@@ -22,6 +24,10 @@ DB.Ready(function()
         weapons[result[i].identifier]=decode(result[i].weapons)
         addons[result[i].identifier]=decode(result[i].addons)
         metadata[result[i].identifier]=decode(result[i].metadata)
+    end
+    local result = db('SELECT', 'items')
+    for i=1,#result do
+        items[result[i].name]={name=result[i].name,limit=result[i].limit,mission=result[i].mission}
     end
 end)
 
@@ -63,14 +69,46 @@ local function CreatePlayerHandler(source,identifier,identifiers)
         if not weapons[weapon]then
             local chk=GetHashKey('weapon_'..prs)
             if not weapons[chk]then
-                print('^1Cannot Find Wanted Weapon')
+                print('^1Is '..prs..' A Valid Weapon?^7')
                 return
             else
                 weapon=chk
             end
         end
-        weapons[weapon]={name=prs,ammo=tonumber(ammo)or 255}
+        if not weapons[weapon]then
+            return
+        end
+        self.weapons[weapon]={name=prs,ammo=tonumber(ammo)or 255}
         self.TriggerEvent('ffsa:GiveWeapon', weapon, weapons[weapon].ammo)
+        return true
+    end
+    self.removeWeapon = function(weapon)
+        local prs=weapon
+        weapon=(type(weapon)=='string'and GetHashKey(weapon)or weapon)
+        if not weapons[weapon]then
+            local chk=GetHashKey('weapon_'..prs)
+            if not weapons[chk]then
+                print('^1Is '..prs..' A Valid Weapon?^7')
+                return
+            else
+                weapon=chk
+            end
+        end
+        if not weapons[weapon]then
+            return
+        end
+        self.weapons[weapon]=nil
+        self.TriggerEvent('ffsa:RemoveWeapon', weapon)
+        return true
+    end
+    self.giveItem = function(item, amount)
+        if not items[item]then
+            print('^1Item '..item..' Not Found!^7')
+            return
+        end
+        self.inventory[item]=self.inventory[item]or{name=name,amount=0}
+        self.inventory[item].amount=self.inventory[item].amount+amount
+        self.TriggerEvent('ffsa:AddItem', item, amount)
         return true
     end
     return self
@@ -100,6 +138,7 @@ RegisterServerCallback('ffsa:createPlayerHandler', function(source,cb)
     if users[source]then
         cb(true)
     end
+    SetPlayerRoutingBucket(source, 1)
     local identifiers=GetPlayerIdentifiers(source)
     local identifier=getvalue(identifiers,'license:')
     users[source]=CreatePlayerHandler(source,identifier,identifiers)
