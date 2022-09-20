@@ -343,18 +343,22 @@ end
 CreateThread(function()
     local showed = {}
     while true do
-        Wait(10)
-        for i=1,#markers do
-            local c,x,y=GetScreenCoordFromWorldCoord(markers[i][1],markers[i][2],markers[i][3])
-            if c then
-                showed[markers[i][4]]=false
-                SendNUIMessage({d='m',x,y,#(vector3(markers[i][1],markers[i][2],markers[i][3])-coords),markers[i][4]})
-            else
-                if not showed[markers[i][4]]then
-                    showed[markers[i][4]]=true
-                    SendNUIMessage({d='h',markers[i][4]})
+        if #markers>0 then
+            Wait(10)
+            for i=1,#markers do
+                local c,x,y=GetScreenCoordFromWorldCoord(markers[i][1],markers[i][2],markers[i][3])
+                if c then
+                    showed[markers[i][4]]=false
+                    SendNUIMessage({d='m',x,y,#(vector3(markers[i][1],markers[i][2],markers[i][3])-coords),markers[i][4]})
+                else
+                    if not showed[markers[i][4]]then
+                        showed[markers[i][4]]=true
+                        SendNUIMessage({d='h',markers[i][4]})
+                    end
                 end
             end
+        else
+            Wait(200)
         end
     end
 end)
@@ -362,7 +366,7 @@ end)
 CreateThread(function()
     Wait(500)
     local c = GetEntityCoords(ped)
-    AddDrawableMarker(c.x+500.0, c.y+100.0, c.z)
+    --AddDrawableMarker(c.x+500.0, c.y+100.0, c.z)
 end)
 
 AddRelationshipGroup('COMPANION_PLAYER')
@@ -496,7 +500,7 @@ DisableIdleCamera(false)
 CreateThread(function()
 	while true do
 		Citizen.Wait(3)
-		SetPauseMenuActive(false)
+		--SetPauseMenuActive(false)
 	end
 end)
 
@@ -529,12 +533,98 @@ RegisterNUICallback('objectives', function()
 
 end)
 
-RegisterCommand('ffsa_pause_menu', function(source,args)
+--[[RegisterCommand('ffsa_pause_menu', function(source,args)
     if not IsPauseMenuActive()then
         OpenPauseMenu(true)
     else
         OpenPauseMenu(false)
     end
+end)--]]
+
+--RegisterKeyMapping("ffsa_pause_menu", "ImLew", "keyboard", "ESCAPE")
+
+local c = GetEntityCoords(ped)
+
+--[[local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
+	return coroutine.wrap(function()
+		local iter, id = initFunc()
+		if not id or id == 0 then
+			disposeFunc(iter)
+			return
+		end
+
+		local enum = {handle = iter, destructor = disposeFunc}
+		setmetatable(enum, entityEnumerator)
+
+		local next = true
+		repeat
+		coroutine.yield(id)
+		next, id = moveFunc(iter)
+		until not next
+
+		enum.destructor, enum.handle = nil, nil
+		disposeFunc(iter)
+	end)
+end
+
+local function EnumerateObjects()
+	return EnumerateEntities(FindFirstObject, FindNextObject, EndFindObject)
+end
+
+local objs = GetGamePool('CObject')
+for _, obj in ipairs(objs) do
+    if NetworkGetEntityIsNetworked(obj) then
+        DeleteNetworkedEntity(obj)
+        DeleteEntity(obj)
+    else
+        DeleteEntity(obj)
+    end
+end
+for object in EnumerateObjects() do
+    SetEntityAsMissionEntity(object, false, false)
+    DeleteObject(object)
+    if (DoesEntityExist(object)) then 
+        DeleteObject(object)
+    end
+end
+
+DisableIdleCamera(true)
+--print(CreateAmbientPickup(GetHashKey('pickup_weapon_assaultrifle'), c.x+2.6, c.y, c.z, 2, 255, GetHashKey('weapon_assaultrifle'), true, true))
+
+CreateThread(function()
+    local ped = PlayerPedId()
+    local c = GetEntityCoords(ped)
+    local n='w_ar_assaultrifle'
+    RequestModel(n)
+    while not HasModelLoaded(n)do
+        Wait(1)
+    end
+    local obj = CreateObject(GetHashKey(n), c.x, c.y, c.z, false, true, false) --CreateWeaponObject(GetHashKey('WEAPON_MACHETE'), 255, c.x, c.y, c.z, true, 1.0, 0)
+    print(obj)
+    AttachEntityToEntity(obj, ped, GetPedBoneIndex(ped, 0x8CBD), 0.12, 0.0, 0.03, -120.0, 25.0, 15.0, true, true, true, true, 5, true)
+    Wait(100)
+    print(IsEntityStatic(obj))
+end)
+--]]
+
+RegisterCommand('ta', function(source,args)
+    local dict='cust@ffsa_pose'
+    local anim='ffsa_pose_01'
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict)do
+        Wait(1)
+    end
+    TaskPlayAnim(ped, dict, anim, 4.0, 4.0, 1000, 1, 0.0, true, true, true)
 end)
 
-RegisterKeyMapping("ffsa_pause_menu", "ImLew", "keyboard", "ESCAPE")
+RegisterCommand('obj', function()
+    local model = GetHashKey('house')
+    RequestModel(model)
+    while not HasModelLoaded(model)do
+        Wait(1)
+    end
+    local c = GetEntityCoords(ped)
+    local obj = CreateObject(model, c.x+2.0, c.y, c.z, true, true, false)
+    print(obj)
+    FreezeEntityPosition(obj, true)
+end)

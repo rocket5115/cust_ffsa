@@ -428,9 +428,18 @@ DB.Ready(function()
     print(res)
 end)
 
-SetRoutingBucketEntityLockdownMode(1, 'strict')
+for i=1,8 do
+    SetRoutingBucketEntityLockdownMode(i,'inactive')
+    SetRoutingBucketPopulationEnabled(i, true)
+end
+SetRoutingBucketEntityLockdownMode(1,'inactive')
+SetRoutingBucketPopulationEnabled(1, true)
+
+--[[AddEventHandler('entityCreating', function(entity)
+    CancelEvent()
+    return
+end)--]]
 
 local filename = function()
     return debug.getinfo(2,"S").source:sub(2):match("^.*/(.*).lua$")
 end
-print(filename())

@@ -22,3 +22,6 @@ server_scripts {
     'server.lua',
     'mm.lua'
 }
+
+data_file 'DLC_ITYP_REQUEST' 'stream/objs/house.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/objs/house.ydr'

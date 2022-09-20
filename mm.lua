@@ -131,6 +131,15 @@ RegisterNetEvent('ffsa:getMission', function(name,server)
                 load(file)()
             end
         end
+    else
+        if server then
+            local file=LoadResourceFile(GetCurrentResourceName(), '/missions/'..name..'-sv.lua')
+            if file then
+                Missions[name]={}
+                Missions[name].source=_source
+                load(file)()
+            end
+        end
     end
 end)
 

@@ -11,13 +11,21 @@
         <img id="background" src="./imgs/background.jpg"/>
         <div id="mark"></div><!--On-Screen Markers-->
         <div id="list">
-            <div id="WeaponsShop">
-                <div id="WeaponsAmmo" class="onhover">Ammunition</div>
-                <div id="WeaponsSelect">
-                    <div id="Weapons" class="onhover">Weapons</div>
-                    <div id="SpecialWeapons" class="onhover">Unique Weapons</div>
+            <div id="MainMenu" class="list-chil">
+                <div id="MainResume" class="onhover normal left" title="resume" onclick="Clicked(this)">Resume</div>
+                <div id="MainSettings" class="two-row">
+                    <div id="Settings" class="onhover normal top" title="settings" onclick="Clicked(this)">Open Settings</div>
+                    <div id="Map" class="onhover normal bottom" title="map" onclick="Clicked(this)">Open Main Map</div>
                 </div>
-                <div id="WeaponsSell" class="onhover">Sell</div>
+                <div id="Objectives" class="onhover normal right" title="map" onclick="Clicked(this)">Test</div>
+            </div>
+            <div id="WeaponsShop" class="list-child">
+                <div id="WeaponsAmmo" class="onhover normal left" title="ammo" onclick="Clicked2(this)">Ammunition</div>
+                <div id="WeaponsSelect" class="two-row">
+                    <div id="Weapons" class="onhover normal top" title="weapons" onclick="Clicked2(this)">Open Weapon Shop</div>
+                    <div id="SpecialWeapons" class="onhover normal bottom" title="uweapons" onclick="Clicked2(this)">Unique Weapons</div>
+                </div>
+                <div id="WeaponsSell" class="onhover normal right" title="sell" onclick="Clicked2(this)">Sell</div>
             </div>
         </div>
         <script type="text/javascript" src="./main.js"></script>

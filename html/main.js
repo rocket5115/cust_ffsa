@@ -47,22 +47,9 @@ function Show(st) {
 Show(false);
 
 var back = 'https://'+GetParentResourceName()+'/';
-var empty = JSON.stringify({});
 
-function Objectives() {
-    $.post(back+'objectives', empty);
-};
-
-function OpenMap() {
-    $.post(back+'map', empty);
-};
-
-function Close() {
-    $.post(back+'close', empty);
-};
-
-function Quit() {
-    $.post(back+'quit', empty);
+function Clicked(e) {
+    $.post(back+e.title, "{}")
 }
 
 document.onkeydown=(e)=>{

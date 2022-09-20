@@ -50,6 +50,31 @@ html {
     background-color: rgba(51, 38, 38, 0.736);
 }
 
+#list>.list-child {
+    opacity: 0;
+    display: none;
+}
+
+.two-row {
+    display: grid;
+    grid-template-rows: 49.5% 49.5%;
+    grid-gap: 10px;
+    overflow: hidden;
+}
+
+.two-row>div {
+    border-right: 5px solid rgba(18, 18, 18, 0.713);
+    border-left: 5px solid rgba(18, 18, 18, 0.713);
+}
+
+.normal {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 200%;
+    text-align: center;
+}
+
 #list>div {
     position: relative;
     top: 10%;
@@ -67,6 +92,11 @@ html {
     transition: 0.2s ease-in-out 10ms;
 }
 
+#list>div>div>* {
+    color: rgba(237, 237, 237, 0.905);
+    transition: 0.2s ease-in-out 10ms;
+}
+
 .onhover:hover {
     font-size: 36px;
     color: black;
@@ -74,48 +104,34 @@ html {
     cursor: pointer;
 }
 
-#WeaponsAmmo {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 32px;
-    font-weight: bold;
-    line-height: 200%;
-    text-align: center;
+.left {
     border-right: 5px solid rgba(18, 18, 18, 0.713);
-    background-color: rgb(13, 13, 108);
 }
 
-#WeaponsSelect {
-    display: grid;
-    grid-template-rows: 49.5% 49.5%;
-    grid-gap: 10px;
-}
-
-#WeaponsSelect>div {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 32px;
-    font-weight: bold;
-    line-height: 200%;
-    text-align: center;
-    border-right: 5px solid rgba(18, 18, 18, 0.713);
+.right {
     border-left: 5px solid rgba(18, 18, 18, 0.713);
 }
 
-#Weapons {
+.top {
     border-bottom: 5px solid rgba(18, 18, 18, 0.713);
+}
+
+.bottom {
+    border-top: 5px solid rgba(18, 18, 18, 0.713);
+}
+
+#WeaponsAmmo {
+    background-color: rgb(13, 13, 108);
+}
+
+#Weapons {
     background-color: rgb(13, 108, 35);
 }
 
 #SpecialWeapons {
-    border-top: 5px solid rgba(18, 18, 18, 0.713);
     background-color: rgb(108, 65, 13);
 }
 
 #WeaponsSell {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 32px;
-    font-weight: bold;
-    line-height: 200%;
-    text-align: center;
-    border-left: 5px solid rgba(18, 18, 18, 0.713);
     background-color: rgb(86, 108, 13);
 }

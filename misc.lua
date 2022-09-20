@@ -6,8 +6,7 @@ local function SharedObject(name,cfg)
     local config = {}
     config.player = mission.player
     config.playerId = mission.playerId
-    config.AsyncCallback = mission.Callback.Async
-    config.SyncCallback = mission.Callback.Sync
+    config.Callback = mission.Callback
     config.CreateRedzone = mission.Zones.CreateRedzone
     config.CreateGreenzone = mission.Zones.CreateGreenzone
     config.CreateInteractableZone = mission.Zones.CreateInteractableZone
