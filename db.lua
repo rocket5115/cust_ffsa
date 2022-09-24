@@ -1,6 +1,6 @@
-local resource=GetCurrentResourceName()
-local encode,decode,unpack,insert,remove,saver,loadr,tostring,tonumber,type=json.encode,json.decode,table.unpack,table.insert,table.remove,SaveResourceFile,LoadResourceFile,tostring,tonumber,type
-local ready=false
+local resource = GetCurrentResourceName()
+local encode,decode,unpack,insert,remove,saver,loadr,tostring,tonumber,type = json.encode,json.decode,table.unpack,table.insert,table.remove,SaveResourceFile,LoadResourceFile,tostring,tonumber,type
+local ready = false
 function scandir(directory)
     local i, t = 0, {}
     local pfile = io.popen('dir "'..directory..'" /b')
@@ -60,9 +60,9 @@ CreateThread(function()
     for i=1,#handlers do
         CreateThread(handlers[i])
     end
-    if(debugdb~=""and print(debugdb))
-    print(debugtp)
-    print(debugmd)
+    if(debugdb~="")then print(debugdb)end
+    if(debugtp~="")then print(debugtp)end
+    if(debugmd~="")then print(debugmd)end
 end)
 
 local function ManageDB()
@@ -96,7 +96,7 @@ local function ManageDB()
                             if x=='NOT NULL'or x=='NULL'or x=='INCREMENT'or x=='PRIMARY'then
                                 md[k]=md[k]or{}md[k][#md[k]+1]=x
                                 if x=='INCREMENT'then
-                                    md[k]=md[k].inc=0
+                                    md[k].inc=0
                                 end
                                 if not ap then
                                     ap=true
@@ -348,5 +348,7 @@ DB.Ready(function()
         name='NOT NULL',
         license='NOT NULL'
     })
+    print(res)
+    Wait(1000)
     print(res)
 end)
