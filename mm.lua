@@ -1,11 +1,53 @@
 Missions = {}
+Modules = {}
 local users = {}
+local resource = GetCurrentResourceName()
 local function MinimizeCode(code)
     code=code:gsub('\n', ' ')
     while code:match('  ')do
         code=code:gsub('  ',' ')
     end
     return code
+end
+
+local function mm()
+    local self = {}
+    self.AddListener = AddListener
+    self.Emit = Emit
+    return self
+end
+
+local modules = {}
+
+CreateThread(function()
+    local d=scandir(GetResourcePath(resource)..'/modules')
+    for i=1,#d do
+        if d[i]:match('-sv.lua')then
+            Modules[d[i]:gsub('-sv.lua', '')]=mm()
+            load(LoadResourceFile(resource, '/modules/'..d[i]))()
+        else
+            modules[#modules+1]={MinimizeCode(LoadResourceFile(resource, '/modules/'..d[i])),d[i]:gsub('.lua', '')}
+        end
+    end
+end)
+
+local listeners = {}
+
+function Emit(name,...)
+    if not listeners[name]then
+        return false
+    end
+    for i=1,#listeners[name]do
+        listeners[name][i](...)
+    end
+    return true
+end
+
+function AddListener(name, handler)
+    if not listeners[name]then
+        listeners[name]={}
+    end
+    listeners[name][#listeners[name]+1]=handler
 end
 
 local inventory = {}
@@ -17,7 +59,7 @@ local items = {}
 
 DB.Ready(function()
     local db = DB.New()
-    local result = db('SELECT', 'users')
+    local result = db('SELECT FROM users')
     local decode = json.decode
     for i=1,#result do
         inventory[result[i].identifier]=decode(result[i].inventory)
@@ -25,7 +67,7 @@ DB.Ready(function()
         addons[result[i].identifier]=decode(result[i].addons)
         metadata[result[i].identifier]=decode(result[i].metadata)
     end
-    local result = db('SELECT', 'items')
+    local result = db('SELECT FROM items')
     for i=1,#result do
         items[result[i].name]={name=result[i].name,limit=result[i].limit,mission=result[i].mission}
     end
@@ -147,9 +189,11 @@ RegisterServerCallback('ffsa:createPlayerHandler', function(source,cb)
     if users[source]then
         cb(true)
     end
+    Emit('ffsa:playerLoaded', source)
     SetPlayerRoutingBucket(source, 1)
     local identifiers=GetPlayerIdentifiers(source)
     local identifier=getvalue(identifiers,'license:')
     users[source]=CreatePlayerHandler(source,identifier,identifiers)
+    TriggerClientEvent('ffsa:loadModules', source, modules)
     cb(true)
 end)
