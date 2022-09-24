@@ -1,6 +1,6 @@
-local resource = GetCurrentResourceName()
-local encode,decode,unpack,insert,remove,saver,loadr,tostring,tonumber,type = json.encode,json.decode,table.unpack,table.insert,table.remove,SaveResourceFile,LoadResourceFile,tostring,tonumber,type
-local ready = false
+local resource=GetCurrentResourceName()
+local encode,decode,unpack,insert,remove,saver,loadr,tostring,tonumber,type=json.encode,json.decode,table.unpack,table.insert,table.remove,SaveResourceFile,LoadResourceFile,tostring,tonumber,type
+local ready=false
 function scandir(directory)
     local i, t = 0, {}
     local pfile = io.popen('dir "'..directory..'" /b')
