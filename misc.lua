@@ -1,5 +1,6 @@
 local await = Citizen.Await
 Missions = {}
+Modules = {}
 
 local function SharedObject(name,cfg)
     local mission = GetMissionByName(name)or CreateMissionHandler(name,cfg)
@@ -73,4 +74,9 @@ RegisterNetEvent('ffsa:mission', function(name,code)
     end
 end)
 
-Emit('ffsa:loadMission', 'First Assignment', true)
+RegisterNetEvent('ffsa:loadModules', function(modules)
+    for i=1,#modules do
+        Modules[modules[i][2]]=SharedObject(modules[i][2],{})
+        load(modules[i][1])()
+    end
+end)
