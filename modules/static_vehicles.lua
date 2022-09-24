@@ -1,1 +1,0 @@
-local obj = Modules['static_vehicles']--unused
