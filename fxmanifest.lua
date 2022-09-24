@@ -19,9 +19,7 @@ client_scripts {
     'misc.lua'
 }
 server_scripts {
+    'db.lua',
     'server.lua',
     'mm.lua'
 }
-
-data_file 'DLC_ITYP_REQUEST' 'stream/objs/house.ytyp'
-data_file 'DLC_ITYP_REQUEST' 'stream/objs/house.ydr'
