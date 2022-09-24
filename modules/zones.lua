@@ -1,7 +1,7 @@
-local obj = Modules['static_vehicles']--unused
+local obj = Modules['zones']
 
---[[local function XY(center,xradius,yradius)
-    local x1,x2,y1,y2=center.x-xradius,center.x+xradius,center.y-yradius,center.y+yradius
+--[[local function XY(center,xradius,yradius,rot)
+    local x1,x2,y1,y2=center.x-(xradius-rot),center.x+(xradius-rot),center.y-(yradius-rot),center.y+(yradius-rot)
     DrawLine(x1, y1, center.z, x2, y1, center.z, 255,0,0,255)
     DrawLine(x1, y1, center.z, x1, y2, center.z, 255,0,0,255)
     DrawLine(x2, y1, center.z, x2, y2, center.z, 255,0,0,255)
@@ -41,6 +41,9 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('ffsa:changeZone', function()
-    
+RegisterNetEvent('ffsa:changeZone', function(metadata)
+    local patrols=(metadata:sub(1,1)=="1"and Emit('ffsa:patrolsOn',true,zone)or Emit('ffsa:patrolsOn',false,zone))
+    local patrol_types=tonumber(metadata:sub(2,2))
+    local difficulty=tonumber(metadata:sub(3,3))
+
 end)
