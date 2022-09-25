@@ -28,6 +28,14 @@ local function TriggerSyncServerCallback(name,...)
     return unpack(retval)
 end
 
+local function TriggerServerCallback(name,cb,...)
+    if type(cb)=='function'then
+        TriggerAsyncServerCallback(name,cb,...)
+    else
+        return TriggerSyncServerCallback(name,cb,...)
+    end
+end
+
 local ccallbacks = {}
 local listeners = {}
 
@@ -452,6 +460,7 @@ local function CreateMission(name,config)
     end
     self.Callback.Async = TriggerAsyncServerCallback
     self.Callback.Sync = TriggerSyncServerCallback
+    self.Callback.Server = TriggerServerCallback
     self.Misc.GetGroundzAtCoords = GetGroundzAtCoords
     self.Misc.CanStartMission = CanStartMission(self.config.dependencies)
     self.Misc.Set = function(name,...)
@@ -544,5 +553,114 @@ RegisterCommand('ta', function(source,args)
 end)
 
 RegisterCommand('coords', function(source,args)
-    print(GetEntityCoords(ped))
+    print(vector4(GetEntityCoords(ped), GetEntityHeading(ped)))
 end)
+
+RegisterCommand('car', function(source,args)
+    local veh = GetHashKey(args[1])
+    if IsModelInCdimage(veh)then
+        RequestModel(veh)
+        while not HasModelLoaded(veh)do
+            Wait(1)
+        end
+        local c=GetEntityCoords(ped)
+        local veh = CreateVehicle(veh,c.x,c.y,c.z,GetEntityHeading(ped),true,true)
+        SetVehicleOnGroundProperly(veh)
+        TaskWarpPedIntoVehicle(ped,veh,-1)
+    end
+end)
+
+local function DeleteNetworkedEntity(veh)
+    while not NetworkHasControlOfEntity(veh)do
+        NetworkRequestControlOfEntity(veh)
+        Wait(10)
+    end
+    DeleteEntity(veh)
+    SetEntityAsNoLongerNeeded(veh)
+end
+
+RegisterCommand('dv', function(source,args)
+    local num=tonumber(args[1])or 100.0
+    if IsPedInAnyVehicle(ped)then
+        local veh=GetVehiclePedIsIn(ped,false)
+        DeleteEntity(veh)
+        SetEntityAsNoLongerNeeded(veh)
+    else
+        local c=GetEntityCoords(ped)
+        local vehs = GetGamePool('CVehicle')
+        for _, vehicle in ipairs(vehs) do
+            if #(GetEntityCoords(vehicle)-c)<=num then
+                if not IsPedAPlayer(GetPedInVehicleSeat(vehicle, -1)) then
+                    if NetworkGetEntityIsNetworked(vehicle) then
+                        DeleteNetworkedEntity(vehicle)
+                    else
+                        SetVehicleHasBeenOwnedByPlayer(vehicle, false)
+                        SetEntityAsMissionEntity(vehicle, true, true)
+                        DeleteEntity(vehicle)
+                    end
+                end
+            end
+        end
+        local _peds = GetGamePool('CPed')
+        for _, ped in ipairs(_peds) do
+            if not (IsPedAPlayer(ped)) then
+                RemoveAllPedWeapons(ped, true)
+                if NetworkGetEntityIsNetworked(ped) then
+                    DeleteNetworkedEntity(ped)
+                else
+                    DeleteEntity(ped)
+                end
+            end
+        end
+    end
+end)
+
+local function _CreateVehicle(v,m,c,n,o)
+    local veh=(type(v)=='string'and GetHashKey(v)or v)
+    RequestModel(veh)
+    while not HasModelLoaded(veh)do
+        Wait(1)
+    end
+    local ped=(type(m)=='string'and GetHashKey(m)or m)
+    RequestModel(m)
+    while not HasModelLoaded(m)do
+        Wait(1)
+    end
+    local v=CreateVehicle(v,c.x,c.y,c.z,c.w,n,o)
+    SetVehicleOnGroundProperly(veh)
+    SetVehicleEngineOn(veh,true,true,false)
+    local p=CreatePed(1,ped,c.x,c.y,c.z,c.w,n,o)
+    TaskWarpPedIntoVehicle(p,v,-1)
+    return v,veh,p
+end
+
+local function CreateVehiclesInLine(veh,model,num,ped)
+    local vehs={}
+    local vl=veh
+    for i=1,num do
+        local v,h,p=_CreateVehicle(model,ped or'csb_cop',vector4(GetOffsetFromEntityInWorldCoords(vl,0.0,-15.5,0.0),299.8),true,true)
+        vehs[#vehs+1]={v,p}
+        vl=v
+    end
+    return vehs
+end
+
+CreateThread(function()
+    TriggerServerCallback('ffsa:createPlayerHandler')
+end)
+
+--[[CreateThread(function()
+    ExecuteCommand('dv')
+    local c=vector4(1801.74,3566.925,35.753,299.8)
+    local veh,hash,p = _CreateVehicle('police','csb_cop',c,true,true)
+    Wait(100)
+    local vehs=CreateVehiclesInLine(veh,'police',5)
+    TaskVehicleDriveWander(p,veh,10.0,786603)
+    Wait(200)
+    for i=1,#vehs do
+        TaskVehicleEscort(vehs[i][2],vehs[i][1],(vehs[i-1]~=nil and vehs[i-1][1]or veh),-1,15.0,786603,3.0,1,10.0)
+    end
+end)--]]
+
+--IsEntityOnScreen
+--HasEntityClearLosToEntity

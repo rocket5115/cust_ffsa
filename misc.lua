@@ -8,6 +8,7 @@ local function SharedObject(name,cfg)
     config.player = mission.player
     config.playerId = mission.playerId
     config.Callback = mission.Callback
+    config.TriggerServerCallback = mission.Callback.Server
     config.CreateRedzone = mission.Zones.CreateRedzone
     config.CreateGreenzone = mission.Zones.CreateGreenzone
     config.CreateInteractableZone = mission.Zones.CreateInteractableZone
@@ -38,7 +39,7 @@ AddListener('ffsa:notification', function(...)
     print(...)
     SendNUIMessage({
         type='message',
-        args=...
+        args={...}
     })
 end)
 

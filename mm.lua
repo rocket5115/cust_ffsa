@@ -12,8 +12,11 @@ end
 
 local function mm()
     local self = {}
-    self.AddListener = AddListener
-    self.Emit = Emit
+    self.TriggerClientCallback = TriggerClientCallback
+    self.RegisterServerCallback = RegisterServerCallback
+    self.GetPlayerFromId = function(source)
+        return users[source]or{}
+    end
     return self
 end
 
@@ -25,7 +28,7 @@ CreateThread(function()
         if d[i]:match('-sv.lua')then
             Modules[d[i]:gsub('-sv.lua', '')]=mm()
             load(LoadResourceFile(resource, '/modules/'..d[i]))()
-        else
+        elseif d[i]:match('.lua')then
             modules[#modules+1]={MinimizeCode(LoadResourceFile(resource, '/modules/'..d[i])),d[i]:gsub('.lua', '')}
         end
     end

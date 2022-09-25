@@ -41,9 +41,14 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('ffsa:changeZone', function(metadata)
-    local patrols=(metadata:sub(1,1)=="1"and Emit('ffsa:patrolsOn',true,zone)or Emit('ffsa:patrolsOn',false,zone))
-    local patrol_types=tonumber(metadata:sub(2,2))
-    local difficulty=tonumber(metadata:sub(3,3))
+RegisterNetEvent('ffsa:patrolMetadata', function(data)
+    local coords=GetEntityCoords(obj.player)
+    local c=#(coords-vector3(data.x,data.y,data.z))
+    if c<150.0 then
+        TriggerServerEvent('ffsa:createPatrol', data) 
+    end
+end)
 
+RegisterNetEvent('ffsa:patrolCreate', function(coords,models,formation)
+    
 end)

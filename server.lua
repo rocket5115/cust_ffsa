@@ -59,6 +59,14 @@ function TriggerSyncClientCallback(name,source,...)
     return unpack(retval)
 end
 
+function TriggerClientCallback(name,source,cb,...)
+    if type(cb)=='function'then
+        TriggerAsyncClientCallback(name,source,cb,...)
+    else
+        return TriggerSyncClientCallback(name,source,cb,...)
+    end
+end
+
 AddEventHandler('ffsa:playerDropped', function()
     Emit('ffsa:playerDropped', source)
 end)
@@ -69,10 +77,8 @@ for i=1,8 do
 end
 
 AddEventHandler('entityCreating', function(entity)
-    CancelEvent()
-    return
+    if(GetEntityType(entity)~=1 and GetEntityPopulationType(entity)~=7)then
+        CancelEvent()
+        return
+    end
 end)
-
-local filename = function()
-    return debug.getinfo(2,"S").source:sub(2):match("^.*/(.*).lua$")
-end
