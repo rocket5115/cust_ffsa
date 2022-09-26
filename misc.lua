@@ -1,4 +1,34 @@
 local await = Citizen.Await
+local function _CreateVehicle(v,m,c,n,o)
+    local veh=(type(v)=='string'and GetHashKey(v)or v)
+    RequestModel(veh)
+    while not HasModelLoaded(veh)do
+        Wait(1)
+    end
+    local ped=(type(m)=='string'and GetHashKey(m)or m)
+    RequestModel(m)
+    while not HasModelLoaded(m)do
+        Wait(1)
+    end
+    local v=CreateVehicle(v,c.x,c.y,c.z,c.w,n,o)
+    SetVehicleOnGroundProperly(veh)
+    SetVehicleEngineOn(veh,true,true,false)
+    local p=CreatePed(1,ped,c.x,c.y,c.z,c.w,n,o)
+    TaskWarpPedIntoVehicle(p,v,-1)
+    return v,veh,p
+end
+
+local function CreateVehiclesInLine(veh,model,num,ped)
+    local vehs={}
+    local vl=veh
+    for i=1,num do
+        local v,h,p=_CreateVehicle(model,ped or'csb_cop',vector4(GetOffsetFromEntityInWorldCoords(vl,0.0,-15.5,0.0),299.8),true,true)
+        vehs[#vehs+1]={v,p}
+        vl=v
+    end
+    return vehs
+end
+
 Missions = {}
 Modules = {}
 
@@ -24,6 +54,8 @@ local function SharedObject(name,cfg)
     config.CreateOnScreenMarker = mission.Markers.CreateOnScreenMarker
     config.RemoveOnScreenMarker = mission.Markers.RemoveOnScreenMarker
     config.Spawn = mission.Spawn
+    config.CreateVehicle = _CreateVehicle
+    config.CreateVehiclesInLine = CreateVehiclesInLine
     return config
 end
 

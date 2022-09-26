@@ -41,14 +41,28 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('ffsa:patrolMetadata', function(data)
+RegisterNetEvent('ffsa:patrolMetadata', function(data,zone,pos)
     local coords=GetEntityCoords(obj.player)
     local c=#(coords-vector3(data.x,data.y,data.z))
-    if c<150.0 then
-        TriggerServerEvent('ffsa:createPatrol', data) 
+    if c<150.0 and c>30.0 and(not(HasEntityClearLosToEntity(obj.ped))or not GetScreenCoordFromWorldCoord(data.x,data.y,data.z))then
+        TriggerServerEvent('ffsa:createPatrol',zone,pos)
     end
 end)
 
-RegisterNetEvent('ffsa:patrolCreate', function(coords,models,formation)
-    
+RegisterNetEvent('ffsa:createPatrol',function(data)
+    local c=data.coords
+    local veh,hash,p = obj.CreateVehicle(data.model,data.ped,c,true,true)
+    Wait(100)
+    local vehs=obj.CreateVehiclesInLine(veh,data.models,data.num,data.ped)
+    TaskVehicleDriveWander(p,veh,data.speed,786603)
+    Wait(200)
+    local j=1
+    for i=1,#vehs do
+        TaskVehicleEscort(vehs[i][2],vehs[i][1],(vehs[i-1]~=nil and vehs[i-1][1]or veh),(data.formation[j]~=nil and data.formation[j]or -1),data.speed+5.0,786603,3.0,1,10.0)
+        if data.formation[j]==nil then
+            j=1
+        else
+            j=j+1
+        end
+    end
 end)

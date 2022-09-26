@@ -1,7 +1,7 @@
 local obj = Modules['zones']
 local user_zones = {}
 
-local zone_metadata = { --vector4
+local zone_coords = { --vector4
     {},
     {},
     {
@@ -15,8 +15,28 @@ local zone_metadata = { --vector4
     {}
 }
 
+local zone_metadata = {
+    {
+
+    },
+    {
+        
+    },
+    {
+        {model='police',models={'police'},ped='csb_cop',num=3,speed=10.0,formation={-1}},
+        {model='police',models={'police'},ped='csb_cop',num=3,speed=10.0,formation={-1}}
+    }
+}
+
+for k,v in pairs(zone_coords)do
+    for i=1,#v do
+        if zone_metadata[k][i]then
+            zone_metadata[k][i].coords = v[i]
+        end
+    end
+end
+
 AddListener('ffsa:playerLoaded', function(source)
-    TriggerClientEvent('ffsa:changeZone', source, zone_metadata[1])
     user_zones[source]=1
 end)
 
@@ -28,7 +48,12 @@ RegisterNetEvent('ffsa:changeZone', function(zone)
     if user_zones[source]then
         user_zones[source]=zone
         SetTimeout(30000, function()
-            TriggerClientEvent('ffsa:patrolMetadata', source, zone_metadata[user_zones[source]][math.random(#zone_metadata[user_zones[source]])])
+            local rand=math.random(#zone_coords[user_zones[source]])
+            TriggerClientEvent('ffsa:patrolMetadata', source, zone_coords[user_zones[source]][rand],user_zones[source],rand)
         end)
     end
+end)
+
+RegisterNetEvent('ffsa:createPatrol', function(zone,pos)
+    TriggerClientEvent('ffsa:createPatrol', source, zone_metadata[zone][pos])
 end)
