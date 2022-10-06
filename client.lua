@@ -553,6 +553,7 @@ RegisterCommand('ta', function(source,args)
 end)
 
 RegisterCommand('coords', function(source,args)
+    local ped = PlayerPedId()
     print(vector4(GetEntityCoords(ped), GetEntityHeading(ped)))
 end)
 

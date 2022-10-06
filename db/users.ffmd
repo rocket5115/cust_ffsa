@@ -1,1 +1,1 @@
-{"id":["PRIMARY","INCREMENT","NOT NULL"],"name":["NOT NULL"],"license":["NOT NULL"]}
+{"id":{"PRIMARY","INCREMENT","NOT NULL","inc":0},"name":["NOT NULL"],"license":["NOT NULL"]}

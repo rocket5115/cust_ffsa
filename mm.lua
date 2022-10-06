@@ -1,6 +1,5 @@
 Missions = {}
 Modules = {}
-local users = {}
 local resource = GetCurrentResourceName()
 local function MinimizeCode(code)
     code=code:gsub('\n', ' ')
@@ -10,13 +9,40 @@ local function MinimizeCode(code)
     return code
 end
 
-local function mm()
+local funcs = {}
+local values = {}
+
+local function mm(priority)
     local self = {}
     self.TriggerClientCallback = TriggerClientCallback
     self.RegisterServerCallback = RegisterServerCallback
-    self.GetPlayerFromId = function(source)
-        return users[source]or{}
+    if priority then
+        self.AddFunction = function(name,handler)
+            if(type(name)=='string'and type(handler)=='function')then
+                funcs[name]=handler
+                return true
+            end
+            return nil
+        end
+        self.SetValue = function(name,value)
+            if(type(name)=='string')then
+                values[name]=value
+                return true
+            end
+            return nil
+        end
     end
+    self.GetFunction = function(name)
+        return funcs[name]
+    end
+    self.GetValue = function(name)
+        return values[name]
+    end
+    setmetatable(self,{
+        __index = function(t,k)
+            if funcs[k]then return funcs[k]elseif values[k]then return values[k]else print('^1Invalid Function '..k..'^7')return function()end end
+        end
+    })
     return self
 end
 
@@ -24,8 +50,17 @@ local modules = {}
 
 CreateThread(function()
     local d=scandir(GetResourcePath(resource)..'/modules')
+    table.sort(d)
     for i=1,#d do
-        if d[i]:match('-sv.lua')then
+        local s=d[i]:match('-sv.lua')
+        local e=d[i]:sub(1,1)
+        if e=='!'and s then
+            Modules[d[i]:sub(2,d[i]:len()-7)]=mm(true)
+            load(LoadResourceFile(resource, '/modules/'..d[i]))()
+        elseif e=='!'and not s then
+            Modules[d[i]:sub(2,d[i]:len()-4)]=mm(true)
+            load(LoadResourceFile(resource, '/modules/'..d[i]))()
+        elseif s then
             Modules[d[i]:gsub('-sv.lua', '')]=mm()
             load(LoadResourceFile(resource, '/modules/'..d[i]))()
         elseif d[i]:match('.lua')then
@@ -52,29 +87,6 @@ function AddListener(name, handler)
     end
     listeners[name][#listeners[name]+1]=handler
 end
-
-local inventory = {}
-local weapons = {}
-local addons = {}
-local metadata = {}
-
-local items = {}
-
-DB.Ready(function()
-    local db = DB.New()
-    local result = db('SELECT FROM users')
-    local decode = json.decode
-    for i=1,#result do
-        inventory[result[i].identifier]=decode(result[i].inventory)
-        weapons[result[i].identifier]=decode(result[i].weapons)
-        addons[result[i].identifier]=decode(result[i].addons)
-        metadata[result[i].identifier]=decode(result[i].metadata)
-    end
-    local result = db('SELECT FROM items')
-    for i=1,#result do
-        items[result[i].name]={name=result[i].name,limit=result[i].limit,mission=result[i].mission}
-    end
-end)
 
 local function getvalue(list,value)
     if type(value)=='string'then
@@ -171,8 +183,9 @@ RegisterNetEvent('ffsa:getMission', function(name,server)
         if server then
             local file=LoadResourceFile(GetCurrentResourceName(), '/missions/'..name..'-sv.lua')
             if file then
-                Missions[name]={}
-                Missions[name].source=_source
+                local m=mm(false)
+                m.source=_source
+                Missions[name]=m
                 load(file)()
             end
         end
@@ -180,13 +193,16 @@ RegisterNetEvent('ffsa:getMission', function(name,server)
         if server then
             local file=LoadResourceFile(GetCurrentResourceName(), '/missions/'..name..'-sv.lua')
             if file then
-                Missions[name]={}
-                Missions[name].source=_source
+                local m=mm(false)
+                m.source=_source
+                Missions[name]=m
                 load(file)()
             end
         end
     end
 end)
+
+local users={}
 
 RegisterServerCallback('ffsa:createPlayerHandler', function(source,cb)
     if users[source]then
@@ -196,7 +212,8 @@ RegisterServerCallback('ffsa:createPlayerHandler', function(source,cb)
     SetPlayerRoutingBucket(source, 1)
     local identifiers=GetPlayerIdentifiers(source)
     local identifier=getvalue(identifiers,'license:')
-    users[source]=CreatePlayerHandler(source,identifier,identifiers)
+    users[source]=true
+    Emit('obj:player:handler',CreatePlayerHandler(source,identifier,identifiers))
     TriggerClientEvent('ffsa:loadModules', source, modules)
     cb(true)
 end)

@@ -41,28 +41,28 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('ffsa:patrolMetadata', function(data,zone,pos)
-    local coords=GetEntityCoords(obj.player)
-    local c=#(coords-vector3(data.x,data.y,data.z))
-    if c<150.0 and c>30.0 and(not(HasEntityClearLosToEntity(obj.ped))or not GetScreenCoordFromWorldCoord(data.x,data.y,data.z))then
-        TriggerServerEvent('ffsa:createPatrol',zone,pos)
+local convoy = false
+local shoots = false
+
+CreateThread(function()
+    local ped = obj.player
+    while true do
+        Wait(10)
+        if IsPedShooting(ped)then
+            shoots=true
+            Wait(200)
+        end
     end
 end)
 
-RegisterNetEvent('ffsa:createPatrol',function(data)
-    local c=data.coords
-    local veh,hash,p = obj.CreateVehicle(data.model,data.ped,c,true,true)
-    Wait(100)
-    local vehs=obj.CreateVehiclesInLine(veh,data.models,data.num,data.ped)
-    TaskVehicleDriveWander(p,veh,data.speed,786603)
-    Wait(200)
-    local j=1
-    for i=1,#vehs do
-        TaskVehicleEscort(vehs[i][2],vehs[i][1],(vehs[i-1]~=nil and vehs[i-1][1]or veh),(data.formation[j]~=nil and data.formation[j]or -1),data.speed+5.0,786603,3.0,1,10.0)
-        if data.formation[j]==nil then
-            j=1
-        else
-            j=j+1
-        end
-    end
+RegisterNetEvent('ffsa:patrolMetadata', function(model,driver)
+    local coords=GetEntityCoords(obj.player)
+    local x,y=math.random(coords.x-300.0, coords.x+300.0, coords.y-300.0, coords.y+300.0)
+    local p1,z=GetGroundZAndNormalFor_3dCoord(x,y,100.0)
+    local p1,road=GetClosestRoad(x,y,z,1.0,1,true)
+    local p1,coords,heading=GetClosestVehicleNodeWithHeading(road.x, road.y, road.z, 0, 3.0, 0)
+    local vehicle=obj.CreateVehicle(model,driver,vector4(coords,heading),false,false)
+    coords=GetOffsetFromEntityInWorldCoords(vehicle,4.0,0.0,0.0)
+    SetEntityCoords(vehicle,coords)
+    local blip=
 end)

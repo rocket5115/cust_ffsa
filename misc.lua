@@ -18,11 +18,11 @@ local function _CreateVehicle(v,m,c,n,o)
     return v,veh,p
 end
 
-local function CreateVehiclesInLine(veh,model,num,ped)
+local function CreateVehiclesInLine(veh,model,n,o)
     local vehs={}
     local vl=veh
     for i=1,num do
-        local v,h,p=_CreateVehicle(model,ped or'csb_cop',vector4(GetOffsetFromEntityInWorldCoords(vl,0.0,-15.5,0.0),299.8),true,true)
+        local v,h,p=_CreateVehicle(model,ped or'csb_cop',vector4(GetOffsetFromEntityInWorldCoords(vl,0.0,-15.5,0.0),299.8),n,o)
         vehs[#vehs+1]={v,p}
         vl=v
     end
