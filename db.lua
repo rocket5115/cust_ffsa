@@ -21,7 +21,7 @@ local handlers={}
 
 function DB.Ready(handler)
     if ready then
-        CreateThread(handlers[i])
+        CreateThread(handler)
     else
         handlers[#handlers+1]=handler
     end
@@ -196,28 +196,24 @@ local function UpdateDB()
                 local primary,null,inc=nil,true,nil
                 local inctc=false
                 local keys=""
-                for _,x in pairs(DB.DatabaseMetadata[d])do
-                    if type(x)=='table'then
-                        for i=1,#x do
-                            if x[i]=='NOT NULL'then
-                                null=false
-                            elseif x[i]=='PRIMARY'then
-                                for j=1,#DB.Database[d]do
-                                    if DB.Database[d][j][k]==db[k]and db[k]~=nil then
-                                        return 'DB PRIMARY KEY ALREADY EXISTS:'..db[k]
-                                    elseif db[k]==nil then
-                                        if not inc then
-                                            inctc=true
-                                        end
-                                    elseif DB.Database[d][j][k]~=nil then
-                                        keys=keys..DB.Database[d][j][k]..' '
-                                    end
+                for _,x in pairs(DB.DatabaseMetadata[d][k])do
+                    if x=='NOT NULL'then
+                        null=false
+                    elseif x=='PRIMARY'then
+                        for j=1,#DB.Database[d]do
+                            if DB.Database[d][j][k]==db[k]and db[k]~=nil then
+                                return 'DB PRIMARY KEY ALREADY EXISTS:'..db[k]
+                            elseif db[k]==nil then
+                                if not inc then
+                                    inctc=true
                                 end
-                                primary=true
-                            elseif x[i]=='INCREMENT'then
-                                inc=true
+                            elseif DB.Database[d][j][k]~=nil then
+                                keys=keys..DB.Database[d][j][k]..' '
                             end
                         end
+                        primary=true
+                    elseif x=='INCREMENT'then
+                        inc=true
                     end
                 end
                 if inc and v=='string'then return'DB FIELD:'..k..' HAS TO BE A NUMBER TO BE INCREMENTED; CORRUPTED DATABASE? UPDATE DB MANUALLY'end
@@ -225,29 +221,32 @@ local function UpdateDB()
                     if inc then
                         ty='number'
                         v='number'
-                        db[k]=DB.DatabaseMetadata[d].inc+1
+                        db[k]=DB.DatabaseMetadata[d][k].inc+1
                         keys=keys..v..' '
                     else
                         return'DB PRIMARY KEY CAN NOT BE NULL'
                     end
                 end
+                if inc and ty~='number'then if ty=='nil'then ty='number' db[k]=DB.DatabaseMetadata[d][k].inc+1 else ty='number' end end
                 if inc and ty~='number'then return'DB FIELD:'..k..' HAS TO BE A NUMBER TO BE INCREMENTED; CORRUPTED DATABASE? UPDATE DB MANUALLY'end
                 if db[k]and ty==v then
                     if inc then
-                        if DB.DatabaseMetadata[d].inc>=db[k] then
+                        if DB.DatabaseMetadata[d][k].inc>=db[k] then
                             return 'DB INCREMENT FAILED IN FIELD:'..k..' DB INCREMENT >= VALUE; REMOVE THIS VALUE MANUALLY'
                         else
-                            DB.DatabaseMetadata[d].inc=db[k]
+                            DB.DatabaseMetadata[d][k].inc=db[k]
                             res[k]=db[k]
                         end
+                    else
+                        res[k]=db[k]
                     end
                 elseif db[k]and ty=='table'and v=='string'then
                     res[k]=encode(db[k])
                 elseif not db[k]then
                     if inc then
-                        DB.DatabaseMetadata[d].inc=DB.DatabaseMetadata[d].inc+1
-                        if keys:match(DB.DatabaseMetadata[d].inc)then return'DB PRIMARY ALREADY EXISTS:'..DB.DatabaseMetadata[d].inc end
-                        res[k]=DB.DatabaseMetadata[d].inc
+                        DB.DatabaseMetadata[d][k].inc=DB.DatabaseMetadata[d][k].inc+1
+                        if keys:match(DB.DatabaseMetadata[d][k].inc)then return'DB PRIMARY ALREADY EXISTS:'..DB.DatabaseMetadata[d][k].inc end
+                        res[k]=DB.DatabaseMetadata[d][k].inc
                     elseif not null then
                         return 'DB FIELD:'..k..' CAN NOT BE NULL'
                     else
@@ -335,20 +334,3 @@ function DB.New(db)
     if db then return ManageDB()end
     return UpdateDB()
 end
-
-DB.Ready(function()
-    local db = DB.New(true)
-    local res = db('CREATE', 'users', {
-        id=1,
-        name='',
-        license='',
-        md=''
-    }, {
-        id={'PRIMARY', 'INCREMENT', 'NOT NULL'},
-        name='NOT NULL',
-        license='NOT NULL'
-    })
-    print(res)
-    Wait(1000)
-    print(res)
-end)
