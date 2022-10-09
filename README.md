@@ -3,7 +3,7 @@ cust_ffsa is a framework, which allows for a very well customizable creation of 
 It Features:
 
 ```-Standalone Data-Base
--File System TXT Data-Base *.gstp *.fftp *.ffdb
+-Standalone Database with SQL Like Syntax
 -Async&Sync Client => Server Callbacks
 -Async&Sync Server => Client Callbacks
 -Dynamic Load Of Created Missions
