@@ -25,7 +25,7 @@ CreateThread(function()
         local l=v:len()
         local n=v:sub(1,l-5)
         local r=v:sub(l-4,l)
-        local rn=decode(LoadResourceFile(resource,'db/'..v))
+        local rn=decode(loadr(resource,'db/'..v))
         if r=='.ffdb'then
             DB.Database[n]=rn
             debugdb=debugdb..((debugdb==""and "^2Loaded Data File:"..v)or"\n^2Loaded Data File:"..v)..'^7'
