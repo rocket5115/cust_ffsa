@@ -64,5 +64,5 @@ RegisterNetEvent('ffsa:patrolMetadata', function(model,driver)
     local vehicle=obj.CreateVehicle(model,driver,vector4(coords,heading),false,false)
     coords=GetOffsetFromEntityInWorldCoords(vehicle,4.0,0.0,0.0)
     SetEntityCoords(vehicle,coords)
-    local blip=
+    local blip=AddBlipForEntity(vehicle)
 end)
