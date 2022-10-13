@@ -13,7 +13,7 @@ RegisterNetEvent('ffsa:changeZone', function(zone)
     if user_zones[source]then
         user_zones[source]=zone
         SetTimeout(30000, function()
-            TriggerClientEvent('ffsa:patrolMetadata', source)
+            TriggerClientEvent('ffsa:patrolMetadata', source, 'riot', 's_m_y_swat_01')
         end)
     end
 end)
